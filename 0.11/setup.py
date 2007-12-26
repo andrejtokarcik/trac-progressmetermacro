@@ -5,11 +5,11 @@ from setuptools import setup
 
 setup(
     name = 'TracProgressMeterMacro',
-    version = '0.1a',
+    version = '0.1b',
     packages = ['progressmeter'],
     package_data = { 'progressmeter': [] },
 
-    author = 'Andrej "qwp0|Andros" Tokarcik',
+    author = 'Andrej "qwp0|Andros" Tokarčík',
     author_email = 'androsis@gmail.com',
     description = '''Plugin for Trac (http://trac.edgewall.org)
                      which provides ProgressMeter wiki macro''',

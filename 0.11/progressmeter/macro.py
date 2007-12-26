@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""
-ProgressMeter (wiki macro) plugin
-Usage and installation instructions can be found at:
-    http://trac-hacks.org/wiki/ProgressMeterMacro
-"""
-
+# For information about author, license, etc. see setup.py
 
 from genshi.builder import tag
 
@@ -13,47 +8,50 @@ from trac.core import *
 from trac.wiki.api import IWikiMacroProvider
 from trac.wiki.macros import WikiMacroBase
 from trac.ticket.query import Query
+from trac.wiki.api import parse_args
 
-class MacroSyntaxError(Exception):
+
+class MacroError(Exception):
     """Exception raised when a macro gets not valid arguments."""
 
 class ProgressMeterMacro(WikiMacroBase):
+    """
+    ProgressMeter (wiki macro) plugin
+    Usage and installation instructions can be found at:
+        http://trac-hacks.org/wiki/ProgressMeterMacro
+    """
+
     implements(IWikiMacroProvider)
 
     # IWikiMacroProvider methods
     def expand_macro(self, formatter, name, content):
-        # Testing if passed arguments are correct
-        if type(content) != unicode or len(content) == 0:
-            raise MacroSyntaxError, 'ProgressMeter macro requires at least one argument'
+        # Stripping content -- allows using spaces within arguments --
+        # and checking whether there is not argument 'status'
+        content = ','.join([x.strip() for x in content.split(',') if not x.strip().startswith('status')])
 
-        # Transforming arguments passed to macro into a list and stripping them
-        content = [v.strip() for v in content.split(',')]
+        # Parsing arguments (copied from ticket/query.py from standard trac distribution)
+        # suggested by dhellman
+        req = formatter.req
+        query_string = ''
+        argv, kwargs = parse_args(content, strict=False)
+        if len(argv) > 0 and not 'ticket_value' in kwargs: # 0.10 compatibility hack
+            kwargs['ticket_value'] = argv[0]
 
-        # Testing if passed arguments have correct form
-        for value in content:
-            if value.find('=') == -1:
-                raise MacroSyntaxError, 'ProgressMeter macro requires field and ' \
-                                        'constraints separated by a "="'
+        ticket_value = kwargs.pop('ticket_value', 'list').strip().lower()
+        query_string = '&'.join(['%s=%s' % item
+                                 for item in kwargs.iteritems()])
 
-        # Setting query strings for closed and active tickets
-        query_strings = []
-        query_strings.append('&'.join(['%s' % item
-                                 for item in content]))   # active tickets
-        content.append('status=closed')
-        query_strings.append('&'.join(['%s' % item
-                                 for item in content]))   # closed tickets
-
-        # Getting exact numbers of tickets that match query strings
-        i = 0; query = []; tickets = []; cnt = []
-        for query_string in query_strings:
-            query.append(Query.from_string(self.env, query_string))
-            tickets.append(query[i].execute(formatter.req))
-            cnt.append(tickets[i] and len(tickets[i]) or 0)
-            i = i + 1
+        cnt = []; qs_add = ['', '&status=closed']
+        for i in [0, 1]:
+            query_string = '&'.join(['%s=%s' % item
+                                 for item in kwargs.iteritems()]) + qs_add[i]
+            query = Query.from_string(self.env, query_string)
+            tickets = query.execute(req)
+            cnt.append(tickets and len(tickets) or 0)
 
         # Getting percent of active/closed tickets + formatting output
         percents = {}
-        # tuple of percent and style for each type of tickets (closed, active)
+        # list of percent and style for each type of tickets (closed, active)
         percents['closed'] = [float(cnt[1]) / float(cnt[0]), 'background: #bae0ba']
         percents['active'] = [1 - percents['closed'][0], 'background: #f5f5f5']
 
@@ -72,6 +70,7 @@ class ProgressMeterMacro(WikiMacroBase):
 
         table = tag.table(style=table_css)(tag.tr())
         for key in reversed(percents.keys()):
+            # reversing because we want the closed tickets to be first
             percents[key][0] = unicode(int(percents[key][0] * 100)) + u'%'
             table.children[0](tag.td(style='width: '+percents[key][0]+'; '+percents[key][1]+'; padding: 0')(''))
 
