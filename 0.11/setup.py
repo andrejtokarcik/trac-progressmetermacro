@@ -9,7 +9,7 @@ setup(
     packages = ['progressmeter'],
     package_data = { 'progressmeter': [] },
 
-    author = 'Andrej "qwp0|Andros" Tokarčík',
+    author = 'Andrej "qwp0" Tokarčík',
     author_email = 'androsis@gmail.com',
     description = '''Plugin for Trac (http://trac.edgewall.org)
                      which provides ProgressMeter wiki macro''',

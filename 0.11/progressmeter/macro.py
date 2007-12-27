@@ -11,8 +11,7 @@ from trac.ticket.query import Query
 from trac.wiki.api import parse_args
 
 
-class MacroError(Exception):
-    """Exception raised when a macro gets not valid arguments."""
+__all__ = ['ProgressMeterMacro']
 
 class ProgressMeterMacro(WikiMacroBase):
     """
@@ -20,7 +19,6 @@ class ProgressMeterMacro(WikiMacroBase):
     Usage and installation instructions can be found at:
         http://trac-hacks.org/wiki/ProgressMeterMacro
     """
-
     implements(IWikiMacroProvider)
 
     # IWikiMacroProvider methods
