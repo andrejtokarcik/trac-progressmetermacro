@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
+"""
+ProgressMeterMacro plugin for Trac.
 
-# For information about author, license, etc. see setup.py
+License: GPLv2
+
+Author: Andrej Tokarčík
+Thanks to: Doug Hellman, osimons
+"""
 
 from genshi.builder import tag
 
 from trac.core import *
-from trac.wiki.api import IWikiMacroProvider
+from trac.wiki.api import IWikiMacroProvider, parse_args
+from trac.web.chrome import add_stylesheet, ITemplateProvider
 from trac.wiki.macros import WikiMacroBase
 from trac.ticket.query import Query
-from trac.wiki.api import parse_args
 
 
 __all__ = ['ProgressMeterMacro']
@@ -19,7 +25,7 @@ class ProgressMeterMacro(WikiMacroBase):
     Usage and installation instructions can be found at:
         http://trac-hacks.org/wiki/ProgressMeterMacro
     """
-    implements(IWikiMacroProvider)
+    implements(IWikiMacroProvider, ITemplateProvider)
 
     # IWikiMacroProvider methods
     def expand_macro(self, formatter, name, content):
@@ -50,32 +56,34 @@ class ProgressMeterMacro(WikiMacroBase):
 
         # Getting percent of active/closed tickets + formatting output
         percents = {}
-        # list of percent and style for each type of tickets (closed, active)
-        property = 'background'
-        percents['closed'] = [float(cnt[1]) / float(cnt[0]), '%s: #bae0ba' % property]
-        percents['active'] = [1 - percents['closed'][0], '%s: #f5f5f5' % property]
+        # list of percent and CSS class for each type of tickets (closed, active)
+        percents['closed'] = [float(cnt[1]) / float(cnt[0]), 'closed']
+        percents['active'] = [1 - percents['closed'][0], 'active']
 
-        # CSS styles are mostly copied from htdocs/css/rodamap.css
-        # in standard trac distribution
-        table_css = '''
-             border: 1px solid #d7d7d7;
-             border-collapse: collapse;
-             border-spacing: 0;
-             float: left;
-             margin: 3px 4px 3px 0;
-             empty-cells: show;
-             height: 1.2em;
-             width: 40em;
-        '''
+        # Formatting output...
+        # (separate css is made using some parts of osimons's fullblog plugin)
+        add_stylesheet(formatter.req, 'progressmeter/css/progressmeter.css')
 
-        table = tag.table(style=table_css)(tag.tr())
+        main_div = tag.div(class_='progressmeter')
+        table = tag.table()(tag.tr())
+
         for key in reversed(percents.keys()):
             # reversing because we want the closed tickets to be processed firstly
             percents[key][0] = unicode(int(percents[key][0] * 100)) + u'%'
-            table.children[0](tag.td(style='width: '+percents[key][0]+'; '+percents[key][1]+'; padding: 0')(''))
+            table.children[0](tag.td(style='width: '+percents[key][0]+'', class_=percents[key][1])(''))
 
-        percent_para = tag.p(style='font-size: 10px; line-height: 2.4em')(percents['closed'][0])
+        percent_para = tag.p()(percents['closed'][0])
 
-        output = table + percent_para
-        return output  # Returning...
+        main_div.children = [table, percent_para]
+        return main_div  # Returning...
+
+
+    # ITemplateProvider methods
+    def get_htdocs_dirs(self):
+        """ Makes the 'htdocs' folder inside the egg available. """
+        from pkg_resources import resource_filename
+        return [('progressmeter', resource_filename('progressmeter', 'htdocs'))]
+
+    def get_templates_dirs(self):
+        return []  # must return an iterable
 

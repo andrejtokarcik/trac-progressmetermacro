@@ -5,9 +5,9 @@ from setuptools import setup
 
 setup(
     name = 'TracProgressMeterMacro',
-    version = '0.1b',
+    version = '0.1',
     packages = ['progressmeter'],
-    package_data = { 'progressmeter': [] },
+    package_data = { 'progressmeter': ['htdocs/css/*.css'] },
 
     author = 'Andrej "qwp0" Tokarčík',
     author_email = 'androsis@gmail.com',
@@ -24,5 +24,5 @@ setup(
     entry_points = ''' 
         [trac.plugins]
         progressmeter.macro = progressmeter.macro
-    ''',
+    '''
 )
