@@ -38,9 +38,10 @@ class ProgressMeterMacro(WikiMacroBase):
         ticket_value = kwargs.pop('ticket_value', 'list').strip().lower()
         query_string = '&'.join(['%s=%s' % item
                                  for item in kwargs.iteritems()])
-
         cnt = []; qs_add = ['', '&status=closed']
         for i in [0, 1]:
+            # first cycle -- getting number of all tickets matching the criteria (cnt[0])
+            # second cycle -- getting number of closed tickets matching the criteria (cnt[1])
             query_string = '&'.join(['%s=%s' % item
                                  for item in kwargs.iteritems()]) + qs_add[i]
             query = Query.from_string(self.env, query_string)
@@ -50,8 +51,9 @@ class ProgressMeterMacro(WikiMacroBase):
         # Getting percent of active/closed tickets + formatting output
         percents = {}
         # list of percent and style for each type of tickets (closed, active)
-        percents['closed'] = [float(cnt[1]) / float(cnt[0]), 'background: #bae0ba']
-        percents['active'] = [1 - percents['closed'][0], 'background: #f5f5f5']
+        property = 'background'
+        percents['closed'] = [float(cnt[1]) / float(cnt[0]), '%s: #bae0ba' % property]
+        percents['active'] = [1 - percents['closed'][0], '%s: #f5f5f5' % property]
 
         # CSS styles are mostly copied from htdocs/css/rodamap.css
         # in standard trac distribution
@@ -68,12 +70,12 @@ class ProgressMeterMacro(WikiMacroBase):
 
         table = tag.table(style=table_css)(tag.tr())
         for key in reversed(percents.keys()):
-            # reversing because we want the closed tickets to be first
+            # reversing because we want the closed tickets to be processed firstly
             percents[key][0] = unicode(int(percents[key][0] * 100)) + u'%'
             table.children[0](tag.td(style='width: '+percents[key][0]+'; '+percents[key][1]+'; padding: 0')(''))
 
         percent_para = tag.p(style='font-size: 10px; line-height: 2.4em')(percents['closed'][0])
 
         output = table + percent_para
-        # Returning...
-        return output 
+        return output  # Returning...
+
