@@ -11,8 +11,7 @@ setup(
 
     author = 'Andrej "qwp0" Tokarčík',
     author_email = 'androsis@gmail.com',
-    description = '''Plugin for Trac (http://trac.edgewall.org)
-                     which provides ProgressMeter wiki macro''',
+    description = '''Progress meter macro plugin for Trac''',
     url = 'http://trac-hacks.org/wiki/ProgressMeterMacro',
     license = 'GPL',
 

@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ProgressMeterMacro plugin for Trac.
-
-License: GPLv2
-
-Author: Andrej Tokarčík
-Thanks to: Doug Hellman, osimons
+Progress meter macro plugin for Trac.
 """
 
 from genshi.builder import tag
@@ -46,8 +41,8 @@ class ProgressMeterMacro(WikiMacroBase):
                                  for item in kwargs.iteritems()])
         cnt = []; qs_add = ['', '&status=closed']
         for i in [0, 1]:
-            # first cycle -- getting number of all tickets matching the criteria (cnt[0])
-            # second cycle -- getting number of closed tickets matching the criteria (cnt[1])
+            # first cycle: getting number of all tickets matching the criteria (cnt[0])
+            # second cycle: getting number of closed tickets matching the criteria (cnt[1])
             query_string = '&'.join(['%s=%s' % item
                                  for item in kwargs.iteritems()]) + qs_add[i]
             query = Query.from_string(self.env, query_string)
