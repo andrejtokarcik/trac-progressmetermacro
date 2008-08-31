@@ -37,10 +37,10 @@ class ProgressMeterMacro(WikiMacroBase):
             kwargs['ticket_value'] = argv[0]
 
         ticket_value = kwargs.pop('ticket_value', 'list').strip().lower()
-        query_string = '&'.join(['%s=%s' % item
-                                 for item in kwargs.iteritems()])
-        cnt = {}; qs_add = {'total':'', 'closed':'&status=closed', 'active':'&status=!closed'}
-        for key in ['total', 'closed']:
+        query_string = '&'.join(['%s=%s' % item for item in kwargs.iteritems()])
+        cnt = {}
+        qs_add = {'total': '', 'closed': '&status=closed', 'active': '&status=!closed'}
+        for key in ('closed', 'total'):
             query = Query.from_string(self.env, query_string + qs_add[key])
             tickets = query.execute(req)
             cnt[key] = (tickets and len(tickets) or 0)
@@ -49,12 +49,12 @@ class ProgressMeterMacro(WikiMacroBase):
         cnt['active'] = cnt['total'] - cnt['closed']
 
         # Getting percent of active/closed tickets
-        percents = {'closed':float(cnt['closed']) / float(cnt['total'])}
+        percents = {'closed': float(cnt['closed']) / float(cnt['total'])}
         percents['active'] = 1 - percents['closed']
 
         add_stylesheet(formatter.req, 'progressmeter/css/progressmeter.css')
 
-        main_div = tag.div(class_="milestone")
+        main_div = tag.div(class_='milestone')
 
         # Add title above progress bar
         argv and main_div.children.append(tag.h2(argv))
@@ -65,9 +65,9 @@ class ProgressMeterMacro(WikiMacroBase):
         for key in reversed(percents.keys()):
             # reversing because we want the closed tickets to be processed firstly
             percents[key] = unicode(int(percents[key] * 100)) + u'%'
-            table.children[0](tag.td(style='width: '+percents[key]+'', class_=key)
-                             (tag.a(title="%i of %i tickets %s" % (cnt[key], cnt['total'], key.title()),
-                                    href="%s?%s" % (formatter.href.query(),query_string + qs_add[key]))))
+            table.children[0](tag.td(style='width: '+percents[key], class_=key)
+              (tag.a(title="%i of %i tickets %s" % (cnt[key], cnt['total'], key.title()),
+              href="%s?%s" % (formatter.href.query(),query_string + qs_add[key]))))
         main_div.children.append(table)
 
         # Add percentage displaied to the right of the progress bar
@@ -78,10 +78,9 @@ class ProgressMeterMacro(WikiMacroBase):
         ticket_count = tag.dl()
 
         for key in qs_add.keys():
-            ticket_count.children.append(tag.dt()(tag.a("%s tickets:" % key.title(),
-                                                        href="%s?%s" % (formatter.href.query(), query_string + qs_add[key]))))
+            ticket_count.children.append(tag.dt()("%s tickets:" % key.title()))
             ticket_count.children.append(tag.dd()(tag.a(str(cnt[key]),
-                                                        href="%s?%s" % (formatter.href.query(), query_string + qs_add[key]))))
+              href="%s?%s" % (formatter.href.query(), query_string + qs_add[key]))))
         main_div.children.append(ticket_count)
 
         return main_div
@@ -89,7 +88,7 @@ class ProgressMeterMacro(WikiMacroBase):
 
     # ITemplateProvider methods
     def get_htdocs_dirs(self):
-        """ Makes the 'htdocs' folder inside the egg available. """
+        """ Makes the 'htdocs' folder available for Trac. """
         from pkg_resources import resource_filename
         return [('progressmeter', resource_filename('progressmeter', 'htdocs'))]
 
