@@ -39,38 +39,52 @@ class ProgressMeterMacro(WikiMacroBase):
         ticket_value = kwargs.pop('ticket_value', 'list').strip().lower()
         query_string = '&'.join(['%s=%s' % item
                                  for item in kwargs.iteritems()])
-        cnt = []; qs_add = ['', '&status=closed']
-        for i in [0, 1]:
-            # first cycle: getting number of all tickets matching the criteria (cnt[0])
-            # second cycle: getting number of closed tickets matching the criteria (cnt[1])
-            query_string = '&'.join(['%s=%s' % item
-                                 for item in kwargs.iteritems()]) + qs_add[i]
-            query = Query.from_string(self.env, query_string)
+        cnt = {}; qs_add = {'total':'', 'closed':'&status=closed', 'active':'&status=!closed'}
+        for key in ['total', 'closed']:
+            query = Query.from_string(self.env, query_string + qs_add[key])
             tickets = query.execute(req)
-            cnt.append(tickets and len(tickets) or 0)
+            cnt[key] = (tickets and len(tickets) or 0)
 
-        # Getting percent of active/closed tickets + formatting output
-        percents = {}
-        # list of percent and CSS class for each type of tickets (closed, active)
-        percents['closed'] = [float(cnt[1]) / float(cnt[0]), 'closed']
-        percents['active'] = [1 - percents['closed'][0], 'active']
+        # calculate the number of active tickets
+        cnt['active'] = cnt['total'] - cnt['closed']
 
-        # Formatting output...
-        # (separate css is made using some parts of osimons's fullblog plugin)
+        # Getting percent of active/closed tickets
+        percents = {'closed':float(cnt['closed']) / float(cnt['total'])}
+        percents['active'] = 1 - percents['closed']
+
         add_stylesheet(formatter.req, 'progressmeter/css/progressmeter.css')
 
-        main_div = tag.div(class_='progressmeter')
-        table = tag.table()(tag.tr())
+        main_div = tag.div(class_="milestone")
+
+        # Add title above progress bar
+        argv and main_div.children.append(tag.h2(argv))
+
+        # Add progress bar
+        table = tag.table(class_='progress')(tag.tr())
 
         for key in reversed(percents.keys()):
             # reversing because we want the closed tickets to be processed firstly
-            percents[key][0] = unicode(int(percents[key][0] * 100)) + u'%'
-            table.children[0](tag.td(style='width: '+percents[key][0]+'', class_=percents[key][1])(''))
+            percents[key] = unicode(int(percents[key] * 100)) + u'%'
+            table.children[0](tag.td(style='width: '+percents[key]+'', class_=key)
+                             (tag.a(title="%i of %i tickets %s" % (cnt[key], cnt['total'], key.title()),
+                                    href="%s?%s" % (formatter.href.query(),query_string + qs_add[key]))))
+        main_div.children.append(table)
 
-        percent_para = tag.p()(percents['closed'][0])
+        # Add percentage displaied to the right of the progress bar
+        percent_para = tag.p(class_='percent')(percents['closed'])
+        main_div.children.append(percent_para)
 
-        main_div.children = [table, percent_para]
-        return main_div  # Returning...
+        # Add ticket count below progress bar
+        ticket_count = tag.dl()
+
+        for key in qs_add.keys():
+            ticket_count.children.append(tag.dt()(tag.a("%s tickets:" % key.title(),
+                                                        href="%s?%s" % (formatter.href.query(), query_string + qs_add[key]))))
+            ticket_count.children.append(tag.dd()(tag.a(str(cnt[key]),
+                                                        href="%s?%s" % (formatter.href.query(), query_string + qs_add[key]))))
+        main_div.children.append(ticket_count)
+
+        return main_div
 
 
     # ITemplateProvider methods
