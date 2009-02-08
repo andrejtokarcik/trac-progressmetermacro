@@ -7,9 +7,9 @@ setup(
     name = 'TracProgressMeterMacro',
     version = '0.1',
     packages = ['progressmeter'],
-    package_data = { 'progressmeter': ['htdocs/css/*.css'] },
+    package_data = {'progressmeter': ['templates/*.html']},
 
-    author = 'Andrej "qwp0" Tokarčík',
+    author = 'Andrej "qwp0" T',
     author_email = 'androsis@gmail.com',
     description = '''Progress meter macro plugin for Trac''',
     url = 'http://trac-hacks.org/wiki/ProgressMeterMacro',
@@ -20,7 +20,7 @@ setup(
         'Framework :: Trac',
     ],
 
-    entry_points = ''' 
+    entry_points = '''
         [trac.plugins]
         progressmeter.macro = progressmeter.macro
     '''
