@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name = 'TracProgressMeterMacro',
-    version = '0.1',
+    version = '0.2',
     packages = ['progressmeter'],
     package_data = {'progressmeter': ['templates/*.html']},
 
@@ -13,7 +13,7 @@ setup(
     author_email = 'androsis@gmail.com',
     description = '''Progress meter macro plugin for Trac''',
     url = 'http://trac-hacks.org/wiki/ProgressMeterMacro',
-    license = 'GPL',
+    license = 'BSD',
 
     install_requires = ['Trac'],
     classifiers = [
