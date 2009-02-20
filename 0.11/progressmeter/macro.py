@@ -58,14 +58,12 @@ class ProgressMeterMacro(WikiMacroBase):
         stats = query_stats_data(req, stats, query.constraints)
 
         # ... and finally display them
-        #add_stylesheet(req, 'progressmeter/css/progressmeter.css')
         add_stylesheet(req, 'common/css/roadmap.css')
         return Chrome(self.env).render_template(req, 'progressmeter.html', stats)
 
     ## ITemplateProvider methods
     def get_htdocs_dirs(self):
-        from pkg_resources import resource_filename
-        return [('progressmeter', resource_filename(__name__, 'htdocs'))]
+        return []
 
     def get_templates_dirs(self):
         from pkg_resources import resource_filename
