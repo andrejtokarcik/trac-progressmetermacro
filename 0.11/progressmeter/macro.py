@@ -4,14 +4,15 @@ import os
 
 from trac.config import ExtensionOption
 from trac.core import *
-from trac.ticket.query import Query, QueryModule
+from trac.ticket.query import Query
 from trac.ticket.roadmap import ITicketGroupStatsProvider, apply_ticket_permissions, \
                                 get_ticket_stats
 from trac.web.chrome import Chrome, ITemplateProvider, add_stylesheet
 from trac.wiki.api import IWikiMacroProvider, parse_args
 from trac.wiki.macros import WikiMacroBase
 
-def query_stats_data(req, stat, constraints, grouped_by='component', group=None):
+def query_stats_data(req, stat, constraints, grouped_by='component',
+                     group=None):
     def query_href(extra_args):
         args = {grouped_by: group, 'group': 'status'}
         args.update(constraints)
@@ -23,8 +24,8 @@ def query_stats_data(req, stat, constraints, grouped_by='component', group=None)
                             for interval in stat.intervals]}
 
 class ProgressMeterMacro(WikiMacroBase):
-    """
-    ProgressMeter (wiki macro) plugin for Trac
+    """Progress meter (wiki macro) plugin for Trac
+
     Usage and installation instructions are available at:
         http://trac-hacks.org/wiki/ProgressMeterMacro
     """
@@ -43,23 +44,24 @@ class ProgressMeterMacro(WikiMacroBase):
 
         # Parse arguments
         args, kwargs = parse_args(content, strict=False)
-        kwargs.pop('status', '')  # ignore the argument `status'
+        kwargs.pop('status', None)  # ignore the `status' argument
 
         # Create & execute the query string
         qstr = '&'.join(['%s=%s' % item
                                 for item in kwargs.iteritems()])
-        query = Query.from_string(self.env, qstr)
+        query = Query.from_string(self.env, qstr, max=0)
 
         # Calculate stats
-        tickets = query.execute(req)
-        tickets = apply_ticket_permissions(self.env, req, tickets)
+        qres = query.execute(req)
+        tickets = apply_ticket_permissions(self.env, req, qres)
 
         stats = get_ticket_stats(self.stats_provider, tickets)
-        stats = query_stats_data(req, stats, query.constraints)
+        stats_data = query_stats_data(req, stats, query.constraints)
 
         # ... and finally display them
         add_stylesheet(req, 'common/css/roadmap.css')
-        return Chrome(self.env).render_template(req, 'progressmeter.html', stats)
+        return Chrome(self.env).render_template(req, 'progressmeter.html',
+                                                stats_data)
 
     ## ITemplateProvider methods
     def get_htdocs_dirs(self):
