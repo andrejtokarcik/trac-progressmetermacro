@@ -60,8 +60,9 @@ class ProgressMeterMacro(WikiMacroBase):
 
         # ... and finally display them
         add_stylesheet(req, 'common/css/roadmap.css')
-        return Chrome(self.env).render_template(req, 'progressmeter.html',
-                                                stats_data)
+        chrome = Chrome(self.env)
+        return chrome.render_template(req, 'progressmeter.html', stats_data,
+                                      fragment=True)
 
     ## ITemplateProvider methods
     def get_htdocs_dirs(self):
