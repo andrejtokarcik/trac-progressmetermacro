@@ -43,7 +43,9 @@ class ProgressMeterMacro(WikiMacroBase):
 
         # Parse arguments
         args, kwargs = parse_args(content, strict=False)
-        kwargs.pop('status', None)  # ignore the `status' argument
+        kwargs.pop('status', None)      # ignore the `status' argument;
+        kwargs['format'] = 'count'      # hack the `format' arg in order to display
+                                        # all-tickets stats when no args are supplied
 
         # Create & execute the query string
         qstr = '&'.join(['%s=%s' % item
