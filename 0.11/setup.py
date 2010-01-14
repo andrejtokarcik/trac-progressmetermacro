@@ -15,7 +15,7 @@ setup(
     url = 'http://trac-hacks.org/wiki/ProgressMeterMacro',
     license = 'BSD',
 
-    install_requires = ['Trac'],
+    install_requires = ['Trac >= 0.11.5'],
     classifiers = [
         'Framework :: Trac',
     ],
