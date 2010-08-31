@@ -42,8 +42,9 @@ class ProgressMeterMacro(WikiMacroBase):
         req = formatter.req
 
         # Parse arguments
-        args, kwargs = parse_args(content, strict=False)
-        kwargs.pop('status', None)      # ignore the `status' argument;
+        args, kwargs = parse_args(content)
+        assert not len(args) and not ('status' in kwargs or 'format' in kwargs), \
+          "Invalid input!"
         kwargs['format'] = 'count'      # hack the `format' arg in order to display
                                         # all-tickets stats when no args are supplied
 
@@ -57,7 +58,7 @@ class ProgressMeterMacro(WikiMacroBase):
         tickets = apply_ticket_permissions(self.env, req, qres)
 
         stats = get_ticket_stats(self.stats_provider, tickets)
-        stats_data = query_stats_data(req, stats, query.constraints)
+        stats_data = query_stats_data(req, stats, query.constraint_cols)
 
         # ... and finally display them
         add_stylesheet(req, 'common/css/roadmap.css')
