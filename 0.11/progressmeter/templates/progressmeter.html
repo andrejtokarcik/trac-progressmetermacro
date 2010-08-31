@@ -1,0 +1,16 @@
+<div
+	xmlns:py="http://genshi.edgewall.org/"
+	xmlns:xi="http://www.w3.org/2001/XInclude"
+	class="milestone">
+
+
+	<!--!
+		NOTE: <py:def>s from macros.html are going to be moved to
+		separate files (see the warning in the beginning of the macros.html file)
+	-->
+	<xi:include href="macros.html" />
+
+	<div class="info">
+		${progress_bar(stats, interval_hrefs, stats_href=stats_href)}
+	</div>
+</div>
