@@ -14,7 +14,7 @@ from trac.wiki.macros import WikiMacroBase
 def query_stats_data(req, stat, constraints, grouped_by='component',
                      group=None):
     def query_href(extra_args):
-        args = {grouped_by: group, 'group': 'status'}
+        args = {grouped_by: group, 'group': 'status', 'order': 'priority'}
         args.update(constraints)
         args.update(extra_args)
         return req.href.query(args)
@@ -52,13 +52,17 @@ class ProgressMeterMacro(WikiMacroBase):
         qstr = '&'.join(['%s=%s' % item
                                 for item in kwargs.iteritems()])
         query = Query.from_string(self.env, qstr, max=0)
+        try:
+            constraints = query.constraints[0]
+        except IndexError:
+            constraints = query.constraints
 
         # Calculate stats
         qres = query.execute(req)
         tickets = apply_ticket_permissions(self.env, req, qres)
 
         stats = get_ticket_stats(self.stats_provider, tickets)
-        stats_data = query_stats_data(req, stats, query.constraint_cols)
+        stats_data = query_stats_data(req, stats, constraints)
 
         # ... and finally display them
         add_stylesheet(req, 'common/css/roadmap.css')
