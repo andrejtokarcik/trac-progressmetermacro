@@ -42,7 +42,7 @@ class ProgressMeterMacro(WikiMacroBase):
         req = formatter.req
 
         # Parse arguments
-        args, kwargs = parse_args(content)
+        args, kwargs = parse_args(content, strict=False)
         assert not len(args) and not ('status' in kwargs or 'format' in kwargs), \
           "Invalid input!"
         kwargs['format'] = 'count'      # hack the `format' arg in order to display
