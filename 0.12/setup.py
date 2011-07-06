@@ -5,12 +5,12 @@ from setuptools import setup
 
 setup(
     name = 'TracProgressMeterMacro',
-    version = '0.2',
+    version = '0.3',
     packages = ['progressmeter'],
     package_data = {'progressmeter': ['templates/*.html']},
 
-    author = 'Andrej "qwp0" T',
-    author_email = 'androsis@gmail.com',
+    author = 'Andrej Tokarčík',
+    author_email = 'andrejtokarcik@gmail.com',
     description = '''Progress meter macro plugin for Trac''',
     url = 'http://trac-hacks.org/wiki/ProgressMeterMacro',
     license = 'BSD',
