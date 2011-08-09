@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 setup(
     name = 'TracProgressMeterMacro',
     version = '0.3',
-    packages = ['progressmeter'],
+    packages = find_packages(exclude['*.tests*']),
     package_data = {'progressmeter': ['templates/*.html']},
 
     author = 'Andrej Tokarčík',
@@ -15,7 +15,7 @@ setup(
     url = 'http://trac-hacks.org/wiki/ProgressMeterMacro',
     license = 'BSD',
 
-    install_requires = ['Trac >= 0.11.5'],
+    install_requires = ['Python >= 2.5', 'Trac >= 0.11.5'],
     classifiers = [
         'Framework :: Trac',
     ],
