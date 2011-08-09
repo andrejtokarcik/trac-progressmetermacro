@@ -58,10 +58,10 @@ class ProgressMeterMacro(WikiMacroBase):
         # when no kwargs are supplied
         kwargs['format'] = 'count'
 
-        # special case for values equal to '#': replace with current
+        # special case for values equal to 'self': replace with current
         # ticket number, if available
         for key in kwargs.keys():
-            if kwargs[key] == '#':
+            if kwargs[key] == 'self':
                 current_ticket = self._this_ticket(req)
                 if current_ticket: kwargs[key] = current_ticket
 
