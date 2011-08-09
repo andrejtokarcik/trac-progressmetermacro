@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 setup(
     name = 'TracProgressMeterMacro',
     version = '0.3',
-    packages = find_packages(exclude['*.tests*']),
+    packages = find_packages(exclude=['*.tests*']),
     package_data = {'progressmeter': ['templates/*.html']},
 
     author = 'Andrej Tokarčík',
