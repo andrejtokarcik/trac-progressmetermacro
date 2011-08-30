@@ -49,7 +49,7 @@ class ProgressMeterMacro(WikiMacroBase):
         if match:
             return match.group(1)
 
-    def _parse_macro_content(self, content):
+    def _parse_macro_content(self, content, req):
         args, kwargs = parse_args(content, strict=False)
         assert not args and not ('status' in kwargs or 'format' in kwargs), \
           "Invalid input!"
@@ -87,7 +87,7 @@ class ProgressMeterMacro(WikiMacroBase):
 
     def expand_macro(self, formatter, name, content):
         req = formatter.req
-        stats_provider, kwargs = self._parse_macro_content(content)
+        stats_provider, kwargs = self._parse_macro_content(content, req)
 
         # Create & execute the query string
         qstr = '&'.join(['%s=%s' % item
