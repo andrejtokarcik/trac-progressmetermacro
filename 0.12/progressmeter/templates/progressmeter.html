@@ -3,15 +3,13 @@
   xmlns:xi="http://www.w3.org/2001/XInclude"
   class="milestone">
 
-  <div py:if="preview" class="warning system-message">
+  <div py:if="preview" class="notice system-message">
     A preview of the progress meter is displayed below
     since this ticket, which has not been created yet,
     is being referred to:
   </div>
 
   <div class="info trac-progress">
-    <xi:include href="progress_bar.html"
-      py:with="stats = stats; interval_hrefs = interval_hrefs;
-               stats_href = stats_href" />
+    <xi:include href="progress_bar.html" />
   </div>
 </div>

@@ -48,17 +48,14 @@ class ProgressMeterMacro(WikiMacroBase):
             return match.group(1)
         else:
             assert req.path_info == '/newticket', "The `self` " \
-              "keyword can be used only in ticket descriptions."
+              "keyword is permitted in ticket descriptions only."
             return None
 
     def _parse_macro_content(self, content, req):
         args, kwargs = parse_args(content, strict=False)
-        assert not args and not ('status' in kwargs or 'format' in kwargs), \
-          "Invalid input!"
-
-        # hack the `format` kwarg in order to display all-tickets stats when
-        # no kwargs are supplied
-        kwargs['format'] = 'count'
+        kwargs['max'] = 0
+        kwargs['order'] = 'id'
+        kwargs['col'] = 'id'
 
         # special case for values equal to 'self': replace with current ticket
         # number, if available
@@ -102,11 +99,12 @@ class ProgressMeterMacro(WikiMacroBase):
         # Create & execute the query string
         qstr = '&'.join(['%s=%s' % item
                                for item in kwargs.iteritems()])
-        query = Query.from_string(self.env, qstr, max=0)
+        query = Query.from_string(self.env, qstr)
         try:
+            # XXX: simplification, may cause problems with more complex queries
             constraints = query.constraints[0]
         except IndexError:
-            constraints = query.constraints
+            constraints = {}
 
         # Calculate stats
         qres = query.execute(req)
